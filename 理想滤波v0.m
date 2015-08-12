@@ -1,0 +1,10 @@
+ts=1e-3;
+t=(0:1000)*ts;
+y=cos(20*2*pi*t)+sin(40*2*pi*t);
+figure;plot(t,y);
+[yf,f]=fft_plot( y, ts);
+fh=ones(1,length(f));
+fh(f<30 & f>-30)=0; 
+yfh=yf.*fh;
+yh=ifft(ifftshift(yfh));
+figure;plot(t,yh);
