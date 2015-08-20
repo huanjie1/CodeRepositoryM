@@ -1,10 +1,10 @@
 function [ outputsig ] = ideal_filter( inputsig, ts, ftype, magpara, delaypara, phasepara, fig )
 %   ideal_filter using FFT and IFFT
 %   ftypes(string)   magpara(freq/Hz)
-%       'lp'                    1e8  (one parameter)
-%       'hp'                  1e8   (one parameter)
-%       'bp'                [1e8, 2e8] (two parameters)
-%       'bs'                [1e8, 2e8] (two parameters)
+%       'lp'              1e8  (one parameter)
+%       'hp'              1e8   (one parameter)
+%       'bp'              [1e8, 2e8] (two parameters)
+%       'bs'              [1e8, 2e8] (two parameters)
 %     'define'            vector with the same length with inputsig
 %                               attention1: if this mode is activated,  inputsig should be the spetrum instead of the time domain waveform
 %                                    in which [ fftresult1, faxis]=fft_plot( sequence_TIME, timeinternal)
@@ -13,9 +13,9 @@ function [ outputsig ] = ideal_filter( inputsig, ts, ftype, magpara, delaypara, 
 %                               attention2: if this function is used upon a real
 %                                    input, magpara should be even symmetrical
 
-%      fig:   draw figures (1) or not (0)
-%     delaypara :  delay(s) 
-%     phasepara:   phaseshift(degree)
+%    fig:         draw figures (1) or not (0)
+%    delaypara:   delay(s) 
+%    phasepara:   phaseshift(degree)
 % 
 % % % example1:
 % % fs=40e9;
@@ -36,7 +36,7 @@ function [ outputsig ] = ideal_filter( inputsig, ts, ftype, magpara, delaypara, 
 
 if nargin<7, fig=0; end
 if nargin<6, phasepara=0; end
-if nargin<6, delaypara=0; end
+if nargin<5, delaypara=0; end
 
 inlength=length(inputsig);
 
