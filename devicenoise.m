@@ -1,13 +1,14 @@
-function [sigout] = devicenoise(sigin,gain,para1,mode,R)
+function [sigout] = devicenoise(sigin,fs,gain,para1,modein,R)
 % 在时域上模拟器件的增益与白噪声特性
 % 参数说明：
-%     输入：输入信号序列（实数或复数行向量），增益，参数，模式，阻抗（默认50欧）
+%     输入：输入信号序列（实数或复数行向量），采样率，增益，参数，模式，阻抗（默认50欧）
 %     输出：输入信号序列（实数或复数行向量）
 % 模式说明：（参数含义）
 %     'f'：双口器件的噪声系数（dB）
 %     'te'：双口器件的等效噪声温度（K）
 %     'nl'：单口器件的噪声电平（dBm/Hz）
 %     'nlt'：单口器件的等效噪声温度（K）
+% 模式说明中添加'c'代表强制以复数模式调用
 
 % % 示例程序
 % % clear
@@ -54,7 +55,7 @@ function [sigout] = devicenoise(sigin,gain,para1,mode,R)
 
 
 
-if nargin<5
+if nargin<6
     R=50;
 end
 
@@ -64,6 +65,9 @@ kt0=k*t0;
 gainlin=10^(gain/10);
 sl=length(sigin);
 
+
+mode=modein;
+mode(strfind(mode,'c'))=[];
 switch mode
     case 'f'
         if para1<0
@@ -85,13 +89,15 @@ switch mode
         noisepsd=k*para1;
 end
 
-% noisepsd = noisepsd_digital = noisepsd_analog*rbw = noisepsd_analog*(fs/nl)
+% noisepsd_digital = noisepsd_analog*rbw = noisepsd_analog*(fs/nl)
+% noisepsd = noisepsd_analog
 % noiseamp = noisepsd_analog*B*R =  = noisepsd_digital/(fs/nl)*fs*R
-if isreal(sigin)
-    noiseamp=sqrt(noisepsd*sl/2*R);% sl/2--psd: effective for sigle sideband
+
+if isreal(sigin) && ~contains(modein,'c')
+    noiseamp=sqrt(noisepsd*fs/2*R);% sl/2--psd: effective for sigle sideband
     sigout=sigin*sqrt(gainlin)+noiseamp*randn(1,sl);
 else
-    noiseamp=sqrt(noisepsd*sl*R);% sl--psd: effective for double sideband
+    noiseamp=sqrt(noisepsd*fs*R);% sl--psd: effective for double sideband
     sigout=sigin*sqrt(gainlin)+noiseamp*randn(1,sl)+1j*noiseamp*randn(1,sl);
 end
 
