@@ -24,6 +24,7 @@ function [ fftresult1, f,fftresultshow,fshow] = fft_plot( sequence_TIME, timeint
 %       4：dbm fig，单边谱 (设输入的为电压，单位为V；50欧阻抗)
 %       5：dbm fig，双边谱 (sequence_TIME为输入的fftshift(fft(.))后的频域结果，fftpin为所对应时间序列的长度（可能比fftshift(fft(.))少，因为补零）)
 %       6：dbm fig，单边谱 (sequence_TIME为输入的fftshift(fft(.))后的频域结果，fftpin为所对应时间序列的长度（可能比fftshift(fft(.))少，因为补零）)
+%       7：linear fig，双边谱 (sequence_TIME为输入的fftshift(fft(.))后的频域结果，fftpin为所对应时间序列的长度（可能比fftshift(fft(.))少，因为补零）)
 %   简化方案：plot(linspace(-fs/2,fs/2,501),abs(fftshift(fft(sigf))));title('已滤信号的频谱');
 
 
@@ -103,6 +104,10 @@ else
     else
         if 6==modenum
             modenum2=4;
+        else
+            if 7==modenum
+                modenum2=1;
+            end
         end
     end
 end
