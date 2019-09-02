@@ -4,6 +4,8 @@ function [ outputsig ] = ideal_filter( inputsig, ts, ftype, magpara, delaypara, 
 %       'lp'              1e8  (one parameter)
 %       'hp'              1e8   (one parameter)
 %       'bp'              [1e8, 2e8] (two parameters)
+%       'cbp'              [1e8, 2e8, order] (three parameters) for complex signal (non-even symmetry response)
+%                                 order<60, sqrt(2).^(-a.^order); order>=60, ideal filter
 %       'bs'              [1e8, 2e8] (two parameters)
 %     'define'            vector with the same length with inputsig
 %                               attention1: if this mode is activated,  inputsig should be the spetrum instead of the time domain waveform
@@ -13,7 +15,7 @@ function [ outputsig ] = ideal_filter( inputsig, ts, ftype, magpara, delaypara, 
 %                               attention2: if this function is used upon a real
 %                                    input, magpara should be even symmetrical
 
-%    fig:         draw figures (1) or not (0)
+%    fig:         draw figures (1) or not (0)   
 %    delaypara:   delay(s) 
 %    phasepara:   phaseshift(degree)
 % 
@@ -48,6 +50,10 @@ switch ftype
     case {'bs','bp'}
          if length(magpara)~=2 || magpara(1)>=magpara(2)
             error('bad magpara');
+         end        
+    case {'cbp'}
+         if length(magpara)~=3 || magpara(1)>=magpara(2)
+            error('bad magpara');
         end
     case 'define'
         if length(magpara)~=inlength
@@ -81,6 +87,13 @@ switch ftype
         filtermaskmag( abs(faxis)>magpara)=1;
     case 'bp'
         filtermaskmag( (abs(faxis)>magpara(1)) & (abs(faxis)<magpara(2)))=1;
+    case 'cbp'
+        if magpara(3)<60
+            filtermaskmag=sqrt(2).^(-( (faxis- (magpara(1)+magpara(2))/2) / ( magpara(2)-magpara(1))*2 ).^magpara(3));
+        else
+            filtermaskmag( ((faxis)>magpara(1)) & ((faxis)<magpara(2)))=1;
+        end
+        
     case 'bs'
         filtermaskmag( (abs(faxis)<magpara(1)) | (abs(faxis)>magpara(2)))=1;
     case 'define'
