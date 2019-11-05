@@ -4,6 +4,8 @@ function [ outputsig ] = ideal_filter( inputsig, ts, ftype, magpara, delaypara, 
 %       'lp'              1e8  (one parameter)
 %       'hp'              1e8   (one parameter)
 %       'bp'              [1e8, 2e8] (two parameters)
+%       'bpr'              [1e8, 2e8, order] (three parameters) roll-off resposne for real signal
+%                                 sqrt(2).^(-a.^order)
 %       'cbp'              [1e8, 2e8, order] (three parameters) for complex signal (non-even symmetry response)
 %                                 order<60, sqrt(2).^(-a.^order); order>=60, ideal filter
 %       'bs'              [1e8, 2e8] (two parameters)
@@ -51,7 +53,7 @@ switch ftype
          if length(magpara)~=2 || magpara(1)>=magpara(2)
             error('bad magpara');
          end        
-    case {'cbp'}
+    case {'bpr','cbp'}
          if length(magpara)~=3 || magpara(1)>=magpara(2)
             error('bad magpara');
         end
@@ -87,9 +89,14 @@ switch ftype
         filtermaskmag( abs(faxis)>magpara)=1;
     case 'bp'
         filtermaskmag( (abs(faxis)>magpara(1)) & (abs(faxis)<magpara(2)))=1;
+    case 'bpr'
+        filterorder=round(magpara(3)/2)*2;
+        filtermaskmag=sqrt(2).^(-( (faxis- (magpara(1)+magpara(2))/2) / ( magpara(2)-magpara(1))*2 ).^filterorder)+...
+            sqrt(2).^(-( (faxis+ (magpara(1)+magpara(2))/2) / ( magpara(2)-magpara(1))*2 ).^filterorder);
     case 'cbp'
         if magpara(3)<60
-            filtermaskmag=sqrt(2).^(-( (faxis- (magpara(1)+magpara(2))/2) / ( magpara(2)-magpara(1))*2 ).^magpara(3));
+            filterorder=round(magpara(3)/2)*2;
+            filtermaskmag=sqrt(2).^(-( (faxis- (magpara(1)+magpara(2))/2) / ( magpara(2)-magpara(1))*2 ).^filterorder);
         else
             filtermaskmag( ((faxis)>magpara(1)) & ((faxis)<magpara(2)))=1;
         end
