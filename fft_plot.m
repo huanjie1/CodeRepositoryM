@@ -87,10 +87,15 @@ if fftpoint<length(sequence_TIME)
 end
 
 sequence_TIME(isnan(sequence_TIME))=0;
-% f=(0:fftpoint-1)*(1/fftpoint)*(1/timeinternal)-0.5/timeinternal;
-w=fftshift(linspace(0,2*pi*(fftpoint-1)/fftpoint,fftpoint));
-w(w>=(pi-2*eps))=w(w>=(pi-2*eps))-2*pi;
+% % f=(0:fftpoint-1)*(1/fftpoint)*(1/timeinternal)-0.5/timeinternal;
+% w=fftshift(linspace(0,2*pi*(fftpoint-1)/fftpoint,fftpoint));
+% w(w>=(pi-2*eps))=w(w>=(pi-2*eps))-2*pi;
+% f=w/2/pi/timeinternal;
+w0=linspace(0,2*pi,fftpoint+1);
+w=circshift(w0(1:fftpoint),floor(fftpoint/2));
+w(1:floor(fftpoint/2))=w(1:floor(fftpoint/2))-2*pi;
 f=w/2/pi/timeinternal;
+
 
 if modenum<5
     fftresult1=fftshift(fft(sequence_TIME,fftpoint));
