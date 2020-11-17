@@ -11,7 +11,11 @@ function [xwidthdraw, profiledraw, xpeakdraw, peakdraw] = profileAnalyzor1d(xaxi
 %     normode, figure type
 %                 'as is', without any modification (default)
 %                 'max norm', normalization using peak value
-%                 'avg norm', normalization using average value, used for gain/directivity/dBi
+%                 'avg norm', normalization using mean value
+%                 'gain norm', normalization using 3D average radiated power, used for gain/directivity/dBi
+%                               assumption: profilelin is for -90~90 deg
+%                               (1/sqrt(2))*(radiated power) (avg for 2-order and -90~90 deg)
+%                               !! attention!! 3D total radiated power for 1D array along x-axis == C1*sum(pattern.*cos(theta)) ~= C2*sum(pattern)
 %                 a number, normalization using the given value
 %     xpeak, the x position of the peak
 %                 'measured', calculate from data
@@ -147,8 +151,14 @@ else
         if strcmpi(normode, 'avg norm')
             refvalue=mean(profilelin);
         else
-            validateattributes(normode, {'numeric'}, {'real','scalar','nonempty'}, 'profileAnalyzor1d', 'normode');
-            refvalue=normode;
+            if strcmpi(normode, 'gain norm')
+                theta1=linspace(0,pi,length(profilelin));
+                theta1=reshape(theta1,size(profilelin));
+                refvalue=sqrt(1/2*sum( (abs(profilelin).^2).*sin(theta1)*pi/length(profilelin) ));
+            else
+                validateattributes(normode, {'numeric'}, {'real','scalar','nonempty'}, 'profileAnalyzor1d', 'normode');
+                refvalue=normode;
+            end            
         end
     end
 end
